@@ -1,0 +1,26 @@
+syntax on
+
+set noeb vb t_vb=
+
+" Wrap gitcommit file types at the appropriate length
+filetype indent plugin on
+
+colors desertExHoward
+
+set guioptions-=T
+set transparency=5
+set guifont=Inconsolata:h14
+set visualbell
+set list listchars=tab:»\ ,eol:¬
+
+let g:ctrlp_working_path_mode = 0
+let g:ctrlp_match_window_bottom = 1
+
+"set number
+"set autoindent
+"set tabstop=2
+"set shiftwidth=2
+"set expandtab
+"set showmatch
+"set nocompatible
+"au BufRead,BufNewFile *.handlebars,*.hbs set ft=handlebars

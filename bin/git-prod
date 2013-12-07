@@ -1,0 +1,28 @@
+#!/bin/sh
+
+echo "Accessing production server..."
+
+# grab "commit 2498bffa9042" from a production server
+production_sha=$(ssh ubuntu@web-2d.i.massrel.com "cd /var/www/tweetriver/current && git log | awk '/commit / { print $2; exit}'")
+
+# grab the SHA part only (e.g. "2498bffa9042")
+production_sha=$(echo $production_sha | awk '/commit / { print $2 }')
+
+echo "Production SHA is" $production_sha
+
+guessed_branch=$(git branch | grep '* ' | awk '{print $2}')
+current_branch=${1:-"$guessed_branch"}
+repo_path=$(git config -l | grep 'remote.origin.url' | awk 'BEGIN { FS=":" } ;
+{print $2}' | sed -e "s/\(.*\).git$/\1/")
+user=$(echo $repo_path | awk 'BEGIN { FS="/" } ; { print $1 }')
+repo=$(echo $repo_path | awk 'BEGIN { FS="/" } ; { print $2 }')
+
+url="https://github.com/$user/$repo/compare/$production_sha...master#files_bucket"
+
+cat - <<COPY_TEXT | pbcopy
+BRANCH: *${current_branch}*
+
+$url
+COPY_TEXT
+
+open $url
