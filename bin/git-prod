@@ -3,7 +3,7 @@
 echo "Accessing production server..."
 
 # grab "commit 2498bffa9042" from a production server
-production_sha=$(ssh ubuntu@tweetriver-misc-1d.i.massrel.com "cd /var/www/tweetriver/current && git log | awk '/commit / { print $2; exit}'")
+production_sha=$(ssh ubuntu@tweetriver-misc.massrel.com "cd /var/www/tweetriver/current && git log | awk '/commit / { print $2; exit}'")
 
 # grab the SHA part only (e.g. "2498bffa9042")
 production_sha=$(echo $production_sha | awk '/commit / { print $2 }')
