@@ -8,7 +8,11 @@ filetype indent plugin on
 colors desertExHoward
 
 set guioptions-=T
-set transparency=5
+
+if has('gui_running')
+  set transparency=10
+endif
+
 set guifont=Inconsolata:h14
 set visualbell
 set list listchars=tab:»\ ,eol:¬
