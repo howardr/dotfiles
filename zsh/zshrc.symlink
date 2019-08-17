@@ -39,9 +39,5 @@ done
 
 unset config_files
 
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
-
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-
 # http://stackoverflow.com/questions/23128353/zsh-shortcut-ctrl-a-not-working
-bindkye -e
+bindkey -e
