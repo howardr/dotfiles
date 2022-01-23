@@ -1,8 +1,10 @@
 # Terminal & Code Setup
 
+Parts of this reused from https://medium.com/ayuth/iterm2-zsh-oh-my-zsh-the-most-power-full-of-terminal-on-macos-bdb2823fb04c
+
 ## Install iTerm 2
 
-https://medium.com/ayuth/iterm2-zsh-oh-my-zsh-the-most-power-full-of-terminal-on-macos-bdb2823fb04c
+Go to https://www.iterm2.com/downloads.html
 
 ## Install SSH Keys
 
