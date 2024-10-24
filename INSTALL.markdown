@@ -120,6 +120,8 @@ From Preferences
  * Appearance > Windows > `Hide scrollbars`
  * Appearaace > Dimming > `Dim background windows`
  * Appearance > Dimming > `Dimming affects only text, not backround.`
+ * Profiles > Default > Colors > Select `Dark Mode`
+ * Profiles > Default > Colors > Uncheck "Use different colors for light mode and dark mode"
  * Profiles > Default > Text > Font > `Dank Mono` at `16pt`
  * Profiles > Default > Window > Transparency > `10`
  * Profiles > Default > Window > Blur > `20`
