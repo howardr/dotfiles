@@ -58,6 +58,14 @@ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.
 
 via [ohmyz.sh](https://ohmyz.sh/#install)
 
+## Install asdf
+
+```
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf
+```
+
+via [asdf-vm.com](https://asdf-vm.com/guide/getting-started.html)
+
 ## Install dotfiles
 
 ```
