@@ -120,8 +120,19 @@ install_dotfiles () {
   done
 }
 
+# TODO: make this follow the other patterns
+install_vscode_settings () {
+  info 'installing vscode settings'
+
+  source="$DOTFILES_ROOT/vscode/settings.json"
+  dest="$HOME/Library/Application Support/Code/User/settings.json"
+
+  ln -fs "$source" "$dest"
+}
+
 setup_gitconfig
 install_dotfiles
+install_vscode_settings
 
 # If we're on a Mac, let's install and setup homebrew.
 if [ "$(uname -s)" == "Darwin" ]
