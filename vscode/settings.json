@@ -2,5 +2,8 @@
     "editor.fontFamily": "'Dank Mono', Inconsolata, Menlo, Monaco, 'Courier New', monospace",
     "editor.tabSize": 2,
     "editor.fontSize": 16,
-    "editor.renderWhitespace": "trailing"
+    "editor.renderWhitespace": "trailing",
+    "workbench.colorTheme": "Monokai",
+    "accessibility.dimUnfocused.enabled": true,
+    "accessibility.dimUnfocused.opacity": 0.5
 }
