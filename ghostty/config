@@ -1,0 +1,7 @@
+theme = Raycast_Dark
+
+font-family = Dank Mono
+font-size = 16
+
+background-opacity = 0.9
+background-blur-radius = 10
