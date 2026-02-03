@@ -1,1 +1,1 @@
-. "$HOME/.asdf/completions/asdf.bash"
+. $HOME/.asdf/completions
