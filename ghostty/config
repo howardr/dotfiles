@@ -1,4 +1,7 @@
-theme = Raycast_Dark
+# If boostrap doesn't work
+# copy+paste in $HOME/.config/ghostty/config
+
+theme = Raycast Dark
 
 font-family = Dank Mono
 font-size = 16
