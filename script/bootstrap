@@ -130,9 +130,21 @@ install_vscode_settings () {
   ln -fs "$source" "$dest"
 }
 
+install_opencode_config () {
+  info 'installing opencode config'
+
+  mkdir -p "$HOME/.config/opencode"
+  source="$DOTFILES_ROOT/opencode/opencode.jsonc"
+  dest="$HOME/.config/opencode/opencode.jsonc"
+
+  ln -fs "$source" "$dest"
+  success "linked opencode config"
+}
+
 setup_gitconfig
 install_dotfiles
 install_vscode_settings
+install_opencode_config
 
 # If we're on a Mac, let's install and setup homebrew.
 if [ "$(uname -s)" == "Darwin" ]
