@@ -61,7 +61,7 @@ via [ohmyz.sh](https://ohmyz.sh/#install)
 ## Install asdf
 
 ```
-git clone https://github.com/asdf-vm/asdf.git ~/.asdf
+brew install asdf
 ```
 
 via [asdf-vm.com](https://asdf-vm.com/guide/getting-started.html)

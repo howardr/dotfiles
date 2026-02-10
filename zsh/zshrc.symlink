@@ -41,3 +41,8 @@ unset config_files
 
 # http://stackoverflow.com/questions/23128353/zsh-shortcut-ctrl-a-not-working
 bindkey -e
+# opencode
+export PATH=/Users/hrauscher/.opencode/bin:$PATH
+source ~/.bashrc
+
+export PATH="$HOME/.local/bin:$PATH"
