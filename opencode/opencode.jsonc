@@ -55,6 +55,7 @@
       "head *": "allow",
       "ls": "allow",
       "ls *": "allow",
+      "pnpm *": "allow",
       "printf *": "allow",
       "ps *": "allow",
       "pwd": "allow",
@@ -78,5 +79,9 @@
     },
     "edit": "allow",
     "webfetch": "allow"
+  },
+  "plugin": ["@mohak34/opencode-notifier@latest"],
+  "mcp": {
+    "cf-portal": { "enabled": true }
   }
 }
