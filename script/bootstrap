@@ -163,12 +163,25 @@ install_cmux_config () {
   success "linked cmux config"
 }
 
+# Silent opencode-notifier config, used inside cmux via cmux/env.zsh
+install_opencode_notifier_cmux_config () {
+  info 'installing opencode-notifier cmux config'
+
+  mkdir -p "$HOME/.config/opencode"
+  source="$DOTFILES_ROOT/opencode/opencode-notifier.cmux.json"
+  dest="$HOME/.config/opencode/opencode-notifier.cmux.json"
+
+  ln -fs "$source" "$dest"
+  success "linked opencode-notifier cmux config"
+}
+
 setup_gitconfig
 install_dotfiles
 install_vscode_settings
 install_opencode_config
 install_ghostty_config
 install_cmux_config
+install_opencode_notifier_cmux_config
 
 # If we're on a Mac, let's install and setup homebrew.
 if [ "$(uname -s)" == "Darwin" ]
