@@ -6,7 +6,7 @@
     "edit": "allow",
     "webfetch": "allow"
   },
-  "plugin": ["@mohak34/opencode-notifier@latest", "./plugins/cmux"],
+  "plugin": ["@mohak34/opencode-notifier@1.1.2", "./plugins/cmux"],
   "mcp": {
     "chrome-devtools": {
       "type": "local",

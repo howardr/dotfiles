@@ -71,6 +71,24 @@ There's a few special files in the hierarchy.
   but still keep those autoloaded files in your home directory. These get
   symlinked in when you run `script/bootstrap`.
 
+## secrets
+
+Don't `export` API tokens from `~/.localrc` or paste them on the command line.
+Exported tokens are visible to every process you start (including package
+install scripts), and inline ones end up in `~/.zsh_history`. Instead, keep
+them in the macOS Keychain and hand them to one command at a time:
+
+```sh
+secret-set GITHUB_TOKEN                    # prompts for the value, stores it in Keychain
+with-secret GITHUB_TOKEN -- gh api user    # runs one command with GITHUB_TOKEN set
+with-secret A_TOKEN B_TOKEN -- some-cmd    # multiple secrets
+secret-rm GITHUB_TOKEN                     # delete it
+```
+
+`with-secret` exports the values in a subshell, so they don't persist in your
+shell and never appear in history. Secrets are stored as generic passwords
+named `env/NAME` in the login Keychain. The functions live in `functions/`.
+
 ## bugs
 
 I want this to work for everyone; that means when you clone it down it should
