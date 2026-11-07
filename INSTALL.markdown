@@ -46,7 +46,7 @@ Bootstrap will:
   not tracked)
 - create `~/code`
 - link everything into place (`script/link`)
-- run `dot`, which `brew bundle`s the [Brewfile](Brewfile) (zsh, asdf, Docker
+- run `dot --brew`, which `brew bundle`s the [Brewfile](Brewfile) (zsh, asdf, Docker
   + Colima, Ghostty, cmux, VS Code and its `code` command, gcloud, ...),
   installs oh-my-zsh and zsh-autosuggestions, and installs the asdf runtimes
   from `~/.tool-versions`

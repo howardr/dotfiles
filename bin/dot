@@ -4,15 +4,15 @@
 #
 #   1. git pull the dotfiles repo
 #   2. link dotfiles into place (script/link)
-#   3. install Homebrew if needed, then `brew bundle` the Brewfile
+#   3. with --brew: install Homebrew if needed, then `brew bundle` the Brewfile
 #   4. install/update oh-my-zsh and zsh-autosuggestions
 #   5. install asdf plugins and the versions in ~/.tool-versions
 #
 # Usage: dot [options]
 #
-#   -u, --upgrade    also upgrade outdated Homebrew packages
+#   -b, --brew       also install the Brewfile (script/bootstrap always does)
+#   -u, --upgrade    also upgrade outdated Homebrew packages (implies --brew)
 #   -d, --defaults   also apply macOS defaults (osx/set-defaults.sh)
-#       --no-brew    skip the Homebrew step (quick sync)
 #   -e, --edit       open the dotfiles in $EDITOR and exit
 #   -h, --help       show this help
 
@@ -22,16 +22,16 @@ DOTFILES_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 . "$DOTFILES_ROOT/script/lib.sh"
 
 UPGRADE=false
-BREW=true
+BREW=false
 DEFAULTS=false
 FAILED=""
 
 for arg in "$@"
 do
   case "$arg" in
-    -u|--upgrade) UPGRADE=true ;;
+    -b|--brew) BREW=true ;;
+    -u|--upgrade) UPGRADE=true; BREW=true ;;
     -d|--defaults) DEFAULTS=true ;;
-    --no-brew) BREW=false ;;
     -e|--edit) exec "${EDITOR:-vim}" "$DOTFILES_ROOT" ;;
     -h|--help) sed -n '3,18p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "dot: unknown option: $arg"; sed -n '11,18p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
@@ -147,10 +147,12 @@ attempt "git pull" update_repo
 step "links"
 attempt "link" link_all
 
+step "homebrew"
 if [ "$BREW" = "true" ] && [ "$(uname -s)" = "Darwin" ]
 then
-  step "homebrew"
   attempt "homebrew" install_homebrew
+else
+  printf "\033[2m  skipped Homebrew (run dot --brew to install the Brewfile)\033[0m\n"
 fi
 
 step "oh-my-zsh"

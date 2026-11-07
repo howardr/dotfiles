@@ -5,7 +5,7 @@
 #   1. create git/gitconfig.symlink (asks for name/email) if it's missing
 #   2. create ~/code
 #   3. link dotfiles into place (script/link)
-#   4. run `dot` to install/update everything else
+#   4. run `dot --brew` to install the Brewfile and everything else
 #
 # Usage: script/bootstrap [-n|--dry-run] [--no-dot]
 
@@ -80,7 +80,7 @@ if [ "$RUN_DOT" = "true" ] && [ "$DRY_RUN" != "true" ] && [ "$(uname -s)" = "Dar
 then
   echo ''
   info "running dot"
-  "$DOTFILES_ROOT/bin/dot" || fail "dot failed"
+  "$DOTFILES_ROOT/bin/dot" --brew || fail "dot failed"
 fi
 
 echo ''

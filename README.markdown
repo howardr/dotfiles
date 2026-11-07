@@ -23,17 +23,23 @@ machine, any time. It's safe to re-run.
 
 1. `git pull`s this repo
 2. links everything into place (`script/link`)
-3. installs Homebrew if needed and `brew bundle`s the [Brewfile](Brewfile)
+3. with `--brew`: installs Homebrew if needed and `brew bundle`s the
+   [Brewfile](Brewfile)
 4. installs/updates oh-my-zsh and zsh-autosuggestions
 5. installs asdf plugins and the versions in `~/.tool-versions`
 
 ```sh
-dot              # the usual
-dot --upgrade    # also upgrade outdated Homebrew packages
+dot              # the usual: pull, link, oh-my-zsh, asdf
+dot --brew       # also install anything missing from the Brewfile
+dot --upgrade    # also upgrade outdated Homebrew packages (implies --brew)
 dot --defaults   # also apply macOS defaults (osx/set-defaults.sh)
-dot --no-brew    # skip Homebrew (quick sync of links and oh-my-zsh)
 dot --edit       # open this repo in $EDITOR
 ```
+
+Homebrew is opt-in so a routine `dot` never installs or adopts apps on a
+machine that doesn't want them. `script/bootstrap` always runs `dot --brew`,
+so new machines get the Brewfile. After adding something to the Brewfile, run
+`dot --brew` on the machines that should get it.
 
 A failed step is reported and the rest keep going; `dot` exits non-zero if
 anything failed.
