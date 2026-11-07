@@ -52,10 +52,15 @@ setup_gitconfig () {
   user ' - What is your github author email?'
   read -r -e git_authoremail
 
-  sed -e "s/AUTHORNAME/$git_authorname/g" \
-      -e "s/AUTHOREMAIL/$git_authoremail/g" \
-      -e "s/GIT_CREDENTIAL_HELPER/$git_credential/g" \
-      git/gitconfig.symlink.example > git/gitconfig.symlink
+  # Fill in the example with `git config` (safe for any characters), then move
+  # it into place only if every step worked.
+  local tmp="git/gitconfig.symlink.tmp.$$"
+  cp git/gitconfig.symlink.example "$tmp" &&
+    git config -f "$tmp" user.name "$git_authorname" &&
+    git config -f "$tmp" user.email "$git_authoremail" &&
+    git config -f "$tmp" credential.helper "$git_credential" &&
+    mv "$tmp" git/gitconfig.symlink ||
+    { rm -f "$tmp"; fail "couldn't write git/gitconfig.symlink"; }
 
   success 'gitconfig'
 }

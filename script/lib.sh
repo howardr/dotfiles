@@ -61,10 +61,18 @@ reset_link_answers
 
 LINKED_COUNT=0
 OK_COUNT=0
+FAILED_COUNT=0
 
 link_file () {
   local src="$1" dst="$2"
   local overwrite=false backup=false skip=false action=
+
+  # Never operate on $HOME itself or outside of it.
+  case "$dst" in
+    "$HOME"|"$HOME"/|"$HOME"/.|"$HOME"/./) fail "refusing to link over \$HOME (from $(tildify "$src"))" ;;
+    "$HOME"/*) ;;
+    *) fail "refusing to link outside \$HOME: $dst" ;;
+  esac
 
   if [ ! -e "$src" ]
   then
@@ -114,16 +122,29 @@ link_file () {
       return 0
     fi
 
+    # Real directories are always backed up, never deleted, even with
+    # "overwrite all".
+    if [ -d "$dst" ] && [ ! -L "$dst" ]
+    then
+      backup=true
+    fi
+
     if [ "$backup" = "true" ] || [ "$backup_all" = "true" ]
     then
       local bak="${dst}.backup"
       [ -e "$bak" ] || [ -L "$bak" ] && bak="${dst}.backup.$(date +%Y%m%d%H%M%S)"
-      mv "$dst" "$bak"
+      mv "$dst" "$bak" || return 1
       success "moved $(tildify "$dst") to $(tildify "$bak")"
     elif [ "$overwrite" = "true" ] || [ "$overwrite_all" = "true" ]
     then
-      rm -rf "$dst"
+      rm -f "$dst" || return 1
       success "removed $(tildify "$dst")"
+    fi
+
+    if [ -e "$dst" ] || [ -L "$dst" ]
+    then
+      warn "$(tildify "$dst") is still in the way; not linking"
+      return 1
     fi
   fi
 
@@ -133,10 +154,18 @@ link_file () {
     return 0
   fi
 
-  mkdir -p "$(dirname "$dst")"
-  ln -s "$src" "$dst"
+  mkdir -p "$(dirname "$dst")" || return 1
+  ln -s "$src" "$dst" || return 1
   LINKED_COUNT=$((LINKED_COUNT + 1))
   success "linked $(tildify "$dst") -> $(tildify "$src")"
+}
+
+# Strip leading/trailing whitespace (including \r from CRLF files).
+trim () {
+  local s="$1"
+  s="${s#"${s%%[![:space:]]*}"}"
+  s="${s%"${s##*[![:space:]]}"}"
+  printf '%s' "$s"
 }
 
 # topic/*.symlink -> ~/.<name>
@@ -146,7 +175,7 @@ link_symlink_files () {
   do
     [ -e "$src" ] || continue
     dst="$HOME/.$(basename "${src%.*}")"
-    link_file "$src" "$dst"
+    link_file "$src" "$dst" || FAILED_COUNT=$((FAILED_COUNT + 1))
   done
 }
 
@@ -167,9 +196,19 @@ link_links_files () {
         *' -> '*) ;;
         *) warn "$(tildify "$manifest"): can't parse line: $line"; continue ;;
       esac
-      src="${line%% -> *}"
-      dst="${line#* -> }"
-      link_file "$topic/$src" "$HOME/$dst"
+      src="$(trim "${line%% -> *}")"
+      dst="$(trim "${line#* -> }")"
+      case "$dst" in
+        ''|.|./|/*|..|../*|*/..|*/../*)
+          warn "$(tildify "$manifest"): destination must be a path under ~ (got '$dst'); skipping"
+          continue ;;
+      esac
+      case "$src" in
+        ''|/*|..|../*|*/..|*/../*)
+          warn "$(tildify "$manifest"): source must be a path inside the topic folder (got '$src'); skipping"
+          continue ;;
+      esac
+      link_file "$topic/$src" "$HOME/$dst" || FAILED_COUNT=$((FAILED_COUNT + 1))
     done 3< "$manifest"
   done
 }
@@ -206,6 +245,11 @@ link_all () {
   link_symlink_files
   link_links_files
   prune_links
+  if [ "$FAILED_COUNT" -gt 0 ]
+  then
+    warn "links: $OK_COUNT already in place, $LINKED_COUNT new, $FAILED_COUNT failed"
+    return 1
+  fi
   if [ "$DRY_RUN" != "true" ]
   then
     success "links: $OK_COUNT already in place, $LINKED_COUNT new"
