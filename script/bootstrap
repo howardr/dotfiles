@@ -141,10 +141,34 @@ install_opencode_config () {
   success "linked opencode config"
 }
 
+install_ghostty_config () {
+  info 'installing ghostty config'
+
+  mkdir -p "$HOME/.config/ghostty"
+  source="$DOTFILES_ROOT/ghostty/config"
+  dest="$HOME/.config/ghostty/config"
+
+  ln -fs "$source" "$dest"
+  success "linked ghostty config"
+}
+
+install_cmux_config () {
+  info 'installing cmux config'
+
+  mkdir -p "$HOME/.config/cmux"
+  source="$DOTFILES_ROOT/cmux/cmux.json"
+  dest="$HOME/.config/cmux/cmux.json"
+
+  ln -fs "$source" "$dest"
+  success "linked cmux config"
+}
+
 setup_gitconfig
 install_dotfiles
 install_vscode_settings
 install_opencode_config
+install_ghostty_config
+install_cmux_config
 
 # If we're on a Mac, let's install and setup homebrew.
 if [ "$(uname -s)" == "Darwin" ]

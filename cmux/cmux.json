@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/manaflow-ai/cmux/main/web/data/cmux.schema.json",
+  "schemaVersion": 1,
+
+  // Terminal rendering (theme, font, opacity) comes from ~/.config/ghostty/config.
+  // Full settings reference: https://www.cmux.dev/docs/configuration
+
+  "app": {
+    "defaultWorkspacePath": "~/code",
+    "preferredEditor": "code",
+    "sendAnonymousTelemetry": false
+  },
+
+  "browser": {
+    "hostsToOpenInEmbeddedBrowser": ["localhost", "*.localhost", "127.0.0.1"]
+  }
+}
