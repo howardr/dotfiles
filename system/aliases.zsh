@@ -1,7 +1,5 @@
-# grc overides for ls
-#   Made possible through contributions from generous benefactors like
-#   `brew install coreutils`
-if $(gls &>/dev/null)
+# GNU ls from `brew install coreutils`, if available
+if (( $+commands[gls] ))
 then
   alias ls="gls -F --color"
   alias l="gls -lAh --color"

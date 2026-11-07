@@ -21,14 +21,15 @@ git_dirty() {
   else
     if [[ "$st" =~ ^nothing ]]
     then
-      echo "on %{$fg_bold[green]%}$(git_prompt_info)%{$reset_color%}"
+      echo "on %{$fg_bold[green]%}$(prompt_git_branch)%{$reset_color%}"
     else
-      echo "on %{$fg_bold[red]%}$(git_prompt_info)%{$reset_color%}"
+      echo "on %{$fg_bold[red]%}$(prompt_git_branch)%{$reset_color%}"
     fi
   fi
 }
 
-git_prompt_info () {
+# (named so it doesn't collide with oh-my-zsh's git_prompt_info)
+prompt_git_branch () {
  ref=$($git symbolic-ref HEAD 2>/dev/null) || return
 # echo "(%{\e[0;33m%}${ref#refs/heads/}%{\e[0m%})"
  echo "${ref#refs/heads/}"
@@ -56,7 +57,7 @@ set_prompt () {
   export RPROMPT="%{$fg_bold[cyan]%}%{$reset_color%}"
 }
 
+# terminal/tab titles are handled by oh-my-zsh (lib/termsupport.zsh)
 precmd() {
-  title "zsh" "%m" "%55<...<%~"
   set_prompt
 }

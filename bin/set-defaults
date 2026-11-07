@@ -1,5 +1,5 @@
 #!/bin/sh
 #
-# Sets OS X defaults by running $ZSH/osx/set-defaults.sh.
+# Sets macOS defaults by running osx/set-defaults.sh.
 
-exec $ZSH/osx/set-defaults.sh
+exec "${DOTFILES:-$HOME/.dotfiles}/osx/set-defaults.sh"
