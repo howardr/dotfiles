@@ -1,198 +1,81 @@
 #!/usr/bin/env bash
 #
-# bootstrap installs things.
-
-DOTFILES_ROOT="`pwd`"
+# bootstrap: first-time setup on a new machine. Safe to re-run.
+#
+#   1. create git/gitconfig.symlink (asks for name/email) if it's missing
+#   2. create ~/code
+#   3. link dotfiles into place (script/link)
+#   4. run `dot` to install/update everything else
+#
+# Usage: script/bootstrap [-n|--dry-run] [--no-dot]
 
 set -e
 
+cd "$(dirname "$0")/.."
+DOTFILES_ROOT="$(pwd -P)"
+. script/lib.sh
+
+RUN_DOT=true
+for arg in "$@"
+do
+  case "$arg" in
+    -n|--dry-run) DRY_RUN=true ;;
+    --no-dot) RUN_DOT=false ;;
+    -h|--help) sed -n '3,10p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) fail "unknown option: $arg" ;;
+  esac
+done
+
 echo ''
 
-info () {
-  printf "  [ \033[00;34m..\033[0m ] $1"
-}
-
-user () {
-  printf "\r  [ \033[0;33m?\033[0m ] $1 "
-}
-
-success () {
-  printf "\r\033[2K  [ \033[00;32mOK\033[0m ] $1\n"
-}
-
-fail () {
-  printf "\r\033[2K  [\033[0;31mFAIL\033[0m] $1\n"
-  echo ''
-  exit 1
-}
-
 setup_gitconfig () {
-  if ! [ -f git/gitconfig.symlink ]
+  if [ -f git/gitconfig.symlink ]
   then
-    info 'setup gitconfig'
-
-    git_credential='cache'
-    if [ "$(uname -s)" == "Darwin" ]
-    then
-      git_credential='osxkeychain'
-    fi
-
-    user ' - What is your github author name?'
-    read -e git_authorname
-    user ' - What is your github author email?'
-    read -e git_authoremail
-
-    sed -e "s/AUTHORNAME/$git_authorname/g" -e "s/AUTHOREMAIL/$git_authoremail/g" -e "s/GIT_CREDENTIAL_HELPER/$git_credential/g" git/gitconfig.symlink.example > git/gitconfig.symlink
-
-    success 'gitconfig'
+    return 0
   fi
-}
 
-link_files () {
-  ln -s $1 $2
-  success "linked $1 to $2"
-}
+  info 'setup gitconfig'
+  if [ "$DRY_RUN" = "true" ]
+  then
+    info "would create git/gitconfig.symlink from git/gitconfig.symlink.example"
+    return 0
+  fi
 
-install_dotfiles () {
-  info 'installing dotfiles'
+  local git_credential='cache' git_authorname git_authoremail
+  if [ "$(uname -s)" = "Darwin" ]
+  then
+    git_credential='osxkeychain'
+  fi
 
-  overwrite_all=false
-  backup_all=false
-  skip_all=false
+  user ' - What is your github author name?'
+  read -r -e git_authorname
+  user ' - What is your github author email?'
+  read -r -e git_authoremail
 
-  for source in `find $DOTFILES_ROOT -maxdepth 2 -name \*.symlink`
-  do
-    dest="$HOME/.`basename \"${source%.*}\"`"
+  sed -e "s/AUTHORNAME/$git_authorname/g" \
+      -e "s/AUTHOREMAIL/$git_authoremail/g" \
+      -e "s/GIT_CREDENTIAL_HELPER/$git_credential/g" \
+      git/gitconfig.symlink.example > git/gitconfig.symlink
 
-    if [ -f $dest ] || [ -d $dest ]
-    then
-
-      overwrite=false
-      backup=false
-      skip=false
-
-      if [ "$overwrite_all" == "false" ] && [ "$backup_all" == "false" ] && [ "$skip_all" == "false" ]
-      then
-        user "File already exists: `basename $source`, what do you want to do? [s]kip, [S]kip all, [o]verwrite, [O]verwrite all, [b]ackup, [B]ackup all?"
-        read -n 1 action
-
-        case "$action" in
-          o )
-            overwrite=true;;
-          O )
-            overwrite_all=true;;
-          b )
-            backup=true;;
-          B )
-            backup_all=true;;
-          s )
-            skip=true;;
-          S )
-            skip_all=true;;
-          * )
-            ;;
-        esac
-      fi
-
-      if [ "$overwrite" == "true" ] || [ "$overwrite_all" == "true" ]
-      then
-        rm -rf $dest
-        success "removed $dest"
-      fi
-
-      if [ "$backup" == "true" ] || [ "$backup_all" == "true" ]
-      then
-        mv $dest $dest\.backup
-        success "moved $dest to $dest.backup"
-      fi
-
-      if [ "$skip" == "false" ] && [ "$skip_all" == "false" ]
-      then
-        link_files $source $dest
-      else
-        success "skipped $source"
-      fi
-
-    else
-      link_files $source $dest
-    fi
-
-  done
-}
-
-# TODO: make this follow the other patterns
-install_vscode_settings () {
-  info 'installing vscode settings'
-
-  source="$DOTFILES_ROOT/vscode/settings.json"
-  dest="$HOME/Library/Application Support/Code/User/settings.json"
-
-  ln -fs "$source" "$dest"
-}
-
-install_opencode_config () {
-  info 'installing opencode config'
-
-  mkdir -p "$HOME/.config/opencode"
-  source="$DOTFILES_ROOT/opencode/opencode.jsonc"
-  dest="$HOME/.config/opencode/opencode.jsonc"
-
-  ln -fs "$source" "$dest"
-  success "linked opencode config"
-}
-
-install_ghostty_config () {
-  info 'installing ghostty config'
-
-  mkdir -p "$HOME/.config/ghostty"
-  source="$DOTFILES_ROOT/ghostty/config"
-  dest="$HOME/.config/ghostty/config"
-
-  ln -fs "$source" "$dest"
-  success "linked ghostty config"
-}
-
-install_cmux_config () {
-  info 'installing cmux config'
-
-  mkdir -p "$HOME/.config/cmux"
-  source="$DOTFILES_ROOT/cmux/cmux.json"
-  dest="$HOME/.config/cmux/cmux.json"
-
-  ln -fs "$source" "$dest"
-  success "linked cmux config"
-}
-
-# Silent opencode-notifier config, used inside cmux via cmux/env.zsh
-install_opencode_notifier_cmux_config () {
-  info 'installing opencode-notifier cmux config'
-
-  mkdir -p "$HOME/.config/opencode"
-  source="$DOTFILES_ROOT/opencode/opencode-notifier.cmux.json"
-  dest="$HOME/.config/opencode/opencode-notifier.cmux.json"
-
-  ln -fs "$source" "$dest"
-  success "linked opencode-notifier cmux config"
+  success 'gitconfig'
 }
 
 setup_gitconfig
-install_dotfiles
-install_vscode_settings
-install_opencode_config
-install_ghostty_config
-install_cmux_config
-install_opencode_notifier_cmux_config
 
-# If we're on a Mac, let's install and setup homebrew.
-if [ "$(uname -s)" == "Darwin" ]
+if [ ! -d "$HOME/code" ]
 then
-  info "installing dependencies"
-  if . bin/dot > /tmp/dotfiles-dot 2>&1
-  then
-    success "dependencies installed"
-  else
-    fail "error installing dependencies"
-  fi
+  run mkdir -p "$HOME/code"
+  [ "$DRY_RUN" = "true" ] || success "created ~/code"
+fi
+
+info "linking dotfiles$([ "$DRY_RUN" = "true" ] && echo ' (dry run)')"
+link_all
+
+if [ "$RUN_DOT" = "true" ] && [ "$DRY_RUN" != "true" ] && [ "$(uname -s)" = "Darwin" ]
+then
+  echo ''
+  info "running dot"
+  "$DOTFILES_ROOT/bin/dot" || fail "dot failed"
 fi
 
 echo ''

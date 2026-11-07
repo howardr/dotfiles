@@ -1,0 +1,2 @@
+# source -> destination (relative to ~). See script/link.
+config -> .config/ghostty/config

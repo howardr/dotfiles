@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+#
+# link: symlink everything in the dotfiles repo into place.
+#
+#   topic/*.symlink -> ~/.<name>
+#   topic/links     -> "source -> destination" per line (destination under ~)
+#
+# Safe to re-run: correct links are left alone, conflicts are asked about,
+# and dangling links that point into the repo are removed.
+#
+# Usage: script/link [-n|--dry-run]
+
+set -e
+
+cd "$(dirname "$0")/.."
+DOTFILES_ROOT="$(pwd -P)"
+. script/lib.sh
+
+for arg in "$@"
+do
+  case "$arg" in
+    -n|--dry-run) DRY_RUN=true ;;
+    -h|--help) sed -n '3,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) fail "unknown option: $arg" ;;
+  esac
+done
+
+info "linking dotfiles$([ "$DRY_RUN" = "true" ] && echo ' (dry run)')"
+link_all

@@ -1,0 +1,2 @@
+# source -> destination (relative to ~). See script/link.
+desertExHoward/colors/desertExHoward.vim -> .vim/colors/desertExHoward.vim

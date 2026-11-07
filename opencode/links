@@ -1,0 +1,4 @@
+# source -> destination (relative to ~). See script/link and README.md.
+opencode.jsonc -> .config/opencode/opencode.jsonc
+# silent notifier config, used inside cmux via cmux/env.zsh
+opencode-notifier.cmux.json -> .config/opencode/opencode-notifier.cmux.json

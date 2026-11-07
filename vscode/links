@@ -1,0 +1,2 @@
+# source -> destination (relative to ~). See script/link.
+settings.json -> Library/Application Support/Code/User/settings.json

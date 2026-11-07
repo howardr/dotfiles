@@ -1,3 +1,13 @@
+" Linked to ~/.vimrc by script/link. Works in terminal vim and MacVim.
+
+set encoding=utf-8
+scriptencoding utf-8
+
+" Having a ~/.vimrc stops vim from loading its built-in defaults (incremental
+" search, sane backspace, etc.), so load them explicitly first.
+unlet! skip_defaults_vim
+source $VIMRUNTIME/defaults.vim
+
 syntax on
 
 set noeb vb t_vb=
@@ -5,7 +15,8 @@ set noeb vb t_vb=
 " Wrap gitcommit file types at the appropriate length
 filetype indent plugin on
 
-colors desertExHoward
+" Linked to ~/.vim/colors by vim/links; silent! so a missing theme isn't fatal
+silent! colorscheme desertExHoward
 
 set guioptions-=T
 
