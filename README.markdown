@@ -1,75 +1,113 @@
 # dotfiles
 
-Forked from [Holman's dotfiles](https://github.com/holman/dotfiles)
-
-## dotfiles
-
-Your dotfiles are how you personalize your system. These are mine.
-
-I was a little tired of having long alias files and everything strewn about
-(which is extremely common on other dotfiles projects, too). That led to this
-project being much more topic-centric. I realized I could split a lot of things
-up into the main areas I used (Ruby, git, system libraries, and so on), so I
-structured the project accordingly.
-
-If you're interested in the philosophy behind why projects like these are
-awesome, you might want to [read my post on the
-subject](http://zachholman.com/2010/08/dotfiles-are-meant-to-be-forked/).
+My dotfiles. Originally forked from
+[Holman's dotfiles](https://github.com/holman/dotfiles) (which in turn grew
+out of [Ryan Bates'](https://github.com/ryanb/dotfiles)), and since diverged.
+The topic-folder layout is still his; read
+[his post](http://zachholman.com/2010/08/dotfiles-are-meant-to-be-forked/) for
+the philosophy.
 
 ## install
 
-See more details on terminal and code setup [INSTALL.markdown](INSTALL.markdown)
-
-For simple install do this:
+New machine: see [INSTALL.markdown](INSTALL.markdown). The short version:
 
 ```sh
 git clone git@github.com:howardr/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
-script/bootstrap
+~/.dotfiles/script/bootstrap
 ```
 
-This will symlink the appropriate files in `.dotfiles` to your home directory.
-Everything is configured and tweaked within `~/.dotfiles`.
+## keeping a machine up to date: `dot`
 
-The main file you'll want to change right off the bat is `zsh/zshrc.symlink`,
-which sets up a few paths that'll be different on your particular machine.
+`dot` (in `bin/`, so it's on your `PATH`) is the one command to run on any
+machine, any time. It's safe to re-run.
 
-`dot` is a simple script that installs some dependencies, sets sane OS X
-defaults, and so on. Tweak this script, and occasionally run `dot` from
-time to time to keep your environment fresh and up-to-date. You can find
-this script in `bin/`.
+1. `git pull`s this repo
+2. links everything into place (`script/link`)
+3. installs Homebrew if needed and `brew bundle`s the [Brewfile](Brewfile)
+4. installs/updates oh-my-zsh and zsh-autosuggestions
+5. installs asdf plugins and the versions in `~/.tool-versions`
+
+```sh
+dot              # the usual
+dot --upgrade    # also upgrade outdated Homebrew packages
+dot --defaults   # also apply macOS defaults (osx/set-defaults.sh)
+dot --no-brew    # skip Homebrew (quick sync of links and oh-my-zsh)
+dot --edit       # open this repo in $EDITOR
+```
+
+A failed step is reported and the rest keep going; `dot` exits non-zero if
+anything failed.
 
 ## topical
 
-Everything's built around topic areas. If you're adding a new area to your
-forked dotfiles — say, "Java" — you can simply add a `java` directory and put
-files in there. Anything with an extension of `.zsh` will get automatically
-included into your shell. Anything with an extension of `.symlink` will get
-symlinked without extension into `$HOME` when you run `script/bootstrap`.
+Everything's built around topic areas. To add one (say, "java"), add a `java/`
+folder and put files in it. What happens to a file depends on its name:
 
-## what's inside
+| File | What happens |
+| --- | --- |
+| `topic/*.zsh` | Sourced into every shell |
+| `topic/path.zsh` | Sourced first, to set up `$PATH` (`homebrew/path.zsh` goes before all others) |
+| `topic/completion.zsh` | Sourced last, after completion is initialized |
+| `topic/*.symlink` | Linked into `~` as a dotfile: `git/gitignore.symlink` becomes `~/.gitignore` |
+| `topic/links` | Links files anywhere under `~`, such as `~/.config` or `~/Library` (see below) |
+| `topic/_name` | A zsh completion function (every topic folder is on `fpath`) |
+| `bin/*` | On your `PATH` |
+| `functions/*` | Autoloaded zsh functions |
 
-A lot of stuff. Seriously, a lot of stuff. Check them out in the file browser
-above and see what components may mesh up with you.
-[Fork it](https://github.com/holman/dotfiles/fork), remove what you don't
-use, and build on what you do use.
+### `links` files
 
-## components
+For anything that doesn't live at `~/.something`, add a `links` file to the
+topic folder with one `source -> destination` per line. The source is relative
+to the topic folder and the destination is relative to `~`. Spaces are fine.
+`#` starts a comment.
 
-There's a few special files in the hierarchy.
+```
+# ghostty/links
+config -> .config/ghostty/config
 
-- **bin/**: Anything in `bin/` will get added to your `$PATH` and be made
-  available everywhere.
-- **topic/\*.zsh**: Any files ending in `.zsh` get loaded into your
-  environment.
-- **topic/path.zsh**: Any file named `path.zsh` is loaded first and is
-  expected to setup `$PATH` or similar.
-- **topic/completion.zsh**: Any file named `completion.zsh` is loaded
-  last and is expected to setup autocomplete.
-- **topic/\*.symlink**: Any files ending in `*.symlink` get symlinked into
-  your `$HOME`. This is so you can keep all of those versioned in your dotfiles
-  but still keep those autoloaded files in your home directory. These get
-  symlinked in when you run `script/bootstrap`.
+# vscode/links
+settings.json -> Library/Application Support/Code/User/settings.json
+```
+
+Link individual files rather than whole directories. Apps like OpenCode and
+cmux write their own files into their config directories, and you don't want
+those ending up in this repo.
+
+### `script/link`
+
+`script/link` creates every link from `*.symlink` and `links` files. `dot` and
+`script/bootstrap` both run it, and you can also run it on its own:
+
+```sh
+script/link --dry-run   # show what would change
+script/link
+```
+
+- Links that are already correct are left alone.
+- If a real file is in the way, it asks: skip, overwrite, or back up (each
+  with an "all" variant). When nothing is there to answer, it skips and warns.
+- Links that point into this repo at a file that no longer exists (because
+  you deleted or renamed it) are removed. Links that point anywhere else are
+  never touched.
+
+## shell
+
+`~/.zshrc` links to `zsh/zshrc.symlink`, which loads things in this order:
+
+1. `~/.localrc`, for machine-specific settings that aren't tracked (see below)
+2. every `path.zsh`
+3. [oh-my-zsh](https://ohmyz.sh), with no theme (the prompt lives in
+   `zsh/prompt.zsh`) and the `gcloud` and `zsh-autosuggestions` plugins. If
+   oh-my-zsh isn't installed, the shell still works; it just runs `compinit`
+   on its own.
+4. every other `*.zsh`. These load after oh-my-zsh, so our aliases, options and
+   key bindings win.
+5. every `completion.zsh`
+
+`$DOTFILES` points at this repo. `$ZSH` belongs to oh-my-zsh.
+
+`~/.localrc` is for anything specific to one machine that shouldn't be in a
+public repo, such as work-only tools and config paths. It is never committed.
 
 ## secrets
 
@@ -89,22 +127,6 @@ secret-rm GITHUB_TOKEN                     # delete it
 shell and never appear in history. Secrets are stored as generic passwords
 named `env/NAME` in the login Keychain. The functions live in `functions/`.
 
-## bugs
+## ideas
 
-I want this to work for everyone; that means when you clone it down it should
-work for you even though you may not have `rbenv` installed, for example. That
-said, I do use this as *my* dotfiles, so there's a good chance I may break
-something if I forget to make a check for a dependency.
-
-If you're brand-new to the project and run into any blockers, please
-[open an issue](https://github.com/holman/dotfiles/issues) on this repository
-and I'd love to get it fixed for you!
-
-## thanks
-
-I forked [Ryan Bates](http://github.com/ryanb)' excellent
-[dotfiles](http://github.com/ryanb/dotfiles) for a couple years before the
-weight of my changes and tweaks inspired me to finally roll my own. But Ryan's
-dotfiles were an easy way to get into bash customization, and then to jump ship
-to zsh a bit later. A decent amount of the code in these dotfiles stem or are
-inspired from Ryan's original project.
+[TODO.markdown](TODO.markdown) lists improvements I've considered but put off.

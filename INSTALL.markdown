@@ -1,29 +1,30 @@
-# Terminal & Code Setup
+# New machine setup
 
-Parts of this reused from https://medium.com/ayuth/iterm2-zsh-oh-my-zsh-the-most-power-full-of-terminal-on-macos-bdb2823fb04c
+Steps for a fresh Mac (Apple Silicon). Most of the work happens in
+`script/bootstrap`; everything else here is either a secret or a manual
+choice.
 
-## Install iTerm 2
+## 1. Install Homebrew
 
-Go to https://www.iterm2.com/downloads.html
-
-## Install SSH Keys
-
-Create `.ssh` directory
-
+```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
-mkdir ~/.ssh
-```
-*Paste in private key to `~/.ssh/id_ed25519`*
 
-Change permisions
+via [brew.sh](https://brew.sh/). You can skip the "next steps" it prints
+about adding `brew` to your `PATH`. `homebrew/path.zsh` handles that once the
+dotfiles are installed.
 
-```
+## 2. Install your SSH key
+
+Copy your private key to `~/.ssh/id_ed25519`, then:
+
+```sh
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
 chmod 400 ~/.ssh/id_ed25519
 ```
 
-## Add SSH config
-
-Paste below config to `~/.ssh/config`
+Create `~/.ssh/config`:
 
 ```
 Host *
@@ -32,113 +33,76 @@ Host *
   VisualHostKey yes
 ```
 
-## Install Homebrew
+## 3. Install the dotfiles
 
-```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-via [brew.sh](https://brew.sh/)
-
-Make sure to follow instructins as end of the install process to add `brew` to PATH
-
-## Install zsh
-
-```
-brew install zsh
-```
-
-via [GitHub](https://github.com/ohmyzsh/ohmyzsh/wiki/Installing-ZSH#how-to-install-zsh-on-many-platforms)
-
-## Install oh-my-zsh
-
-```
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-```
-
-via [ohmyz.sh](https://ohmyz.sh/#install)
-
-## Install asdf
-
-```
-brew install asdf
-```
-
-via [asdf-vm.com](https://asdf-vm.com/guide/getting-started.html)
-
-## Install dotfiles
-
-```
+```sh
 git clone git@github.com:howardr/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
-script/bootstrap
+~/.dotfiles/script/bootstrap
 ```
 
-## Install zsh-autosuggestions
+Bootstrap will:
 
+- ask for your git name and email (creates `git/gitconfig.symlink`, which is
+  not tracked)
+- create `~/code`
+- link everything into place (`script/link`)
+- run `dot`, which `brew bundle`s the [Brewfile](Brewfile) (zsh, asdf, Docker
+  + Colima, Ghostty, cmux, VS Code and its `code` command, gcloud, ...),
+  installs oh-my-zsh and zsh-autosuggestions, and installs the asdf runtimes
+  from `~/.tool-versions`
+
+To preview without changing anything: `script/bootstrap --dry-run`.
+
+Don't use the oh-my-zsh installer from ohmyz.sh. It replaces `~/.zshrc`,
+which unlinks the dotfiles. `dot` installs oh-my-zsh with a plain `git clone`
+instead.
+
+Then open a new terminal.
+
+## 4. Optional: macOS defaults
+
+```sh
+dot --defaults
 ```
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+
+Applies `osx/set-defaults.sh` (fast key repeat, Finder list view, and so on).
+Some settings don't take effect until you log out and back in.
+
+## 5. Fonts
+
+Download the saved fonts (Dank Mono, Inconsolata) from
+[Dropbox/Fonts](https://www.dropbox.com/home/Fonts) and install them. Ghostty
+and VS Code are already configured to use Dank Mono.
+
+## 6. OpenCode + cmux
+
+```sh
+cmux hooks setup
 ```
 
-via [GitHub](https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md#oh-my-zsh)
+On a work machine, also create the work OpenCode config. See
+[opencode/README.md](opencode/README.md).
 
-## Enable `sudo` without password
+## 7. Machine-specific shell settings
 
-*I was convinced that I should go ahead and do this because once my computer is unlocked I am already f'd.*
+Put anything specific to this machine (work tools, `OPENCODE_CONFIG`, ...) in
+`~/.localrc`. It's sourced by the shell and never committed.
 
-Open a terminal, run `EDITOR=vim sudo visudo`
+## 8. Optional: `sudo` without a password
 
-Edit the line:
+*I was convinced that I should go ahead and do this because once my computer
+is unlocked I am already f'd.*
+
+Run `EDITOR=vim sudo visudo` and change
 
 ```
 %admin ALL=(ALL) ALL
 ```
 
-To say:
+to
 
 ```
 %admin ALL=(ALL) NOPASSWD: ALL
 ```
 
 via [stackexchange.com](https://apple.stackexchange.com/questions/257813/enable-sudo-without-a-password-on-macos)
-
-## Setup code
-
-```
-mkdir -p ~/code
-```
-
-## Install Fonts
-
-Download saved fonts from [Dropbox/Fonts](https://www.dropbox.com/home/Fonts)
-
-## Update iTerm settings
-
-From Preferences
-
- * Appearance > General > Theme > `Minimal`
- * Appearance > Windows > `Hide scrollbars`
- * Appearaace > Dimming > `Dim background windows`
- * Appearance > Dimming > `Dimming affects only text, not backround.`
- * Profiles > Default > Colors > Select `Dark Mode`
- * Profiles > Default > Colors > Uncheck "Use different colors for light mode and dark mode"
- * Profiles > Default > Text > Font > `Dank Mono` at `16pt`
- * Profiles > Default > Window > Transparency > `10`
- * Profiles > Default > Window > Blur > `20`
-
-## Download VSCode
-
-Go to https://code.visualstudio.com/
-
-## Update VSCode settings
-
- * Font Size: `16`
- * Font Family: `'Dank Mono', Inconsolata, Menlo, Monaco, 'Courier New', monospace`
- * Tab Size: `2` 😬
- * Render Whitespace: `trailing`
-
-## Add `code` to PATH
-
- * In VSCode type `command` + `shift` + `p`
- * Type `code path` in dialog
- * Select `Shell Command: Install 'code' command in PATH`

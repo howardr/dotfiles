@@ -24,8 +24,9 @@ in the **personal** config.
 └── export OPENCODE_CONFIG="$HOME/.config/opencode/work.jsonc"
 ```
 
-- `script/bootstrap` symlinks the personal config and the notifier config
-  into `~/.config/opencode/`.
+- `opencode/links` symlinks the personal config and the notifier config
+  into `~/.config/opencode/` (via `script/link`, which `dot` and
+  `script/bootstrap` run).
 - `zsh/zshrc.symlink` sources `~/.localrc`, which sets `OPENCODE_CONFIG`.
 - OpenCode loads `$OPENCODE_CONFIG` **after** the global
   `~/.config/opencode/opencode.jsonc`, so the work config wins when both set
