@@ -4,6 +4,11 @@ export CLICOLOR=true
 # autoload everything in functions/ (it's already on fpath via zsh/fpath.zsh)
 autoload -U $DOTFILES/functions/*(:t)
 
+# Terminal titles (set by oh-my-zsh). Its default window title is
+# "user@host:~/dir", which is noise in cmux's sidebar. Show just the directory
+# at the prompt; while a command runs, oh-my-zsh shows the command instead.
+ZSH_THEME_TERM_TITLE_IDLE="%~"
+
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
