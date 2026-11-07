@@ -82,14 +82,6 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-m
 
 via [GitHub](https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md#oh-my-zsh)
 
-## Install rbenv
-
-```
-brew install rbenv
-```
-
-via [GitHub](https://github.com/rbenv/rbenv#installation)
-
 ## Enable `sudo` without password
 
 *I was convinced that I should go ahead and do this because once my computer is unlocked I am already f'd.*
