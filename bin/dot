@@ -116,6 +116,10 @@ install_oh_my_zsh () {
 
 install_asdf_tools () {
   local tool_versions="$HOME/.tool-versions" plugin _rest
+  if ! command -v asdf >/dev/null 2>&1 && [ -f "$HOME/.asdf/asdf.sh" ]
+  then
+    . "$HOME/.asdf/asdf.sh"
+  fi
   if ! command -v asdf >/dev/null 2>&1
   then
     warn "asdf not installed; skipping"

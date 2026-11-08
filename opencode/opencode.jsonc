@@ -11,8 +11,6 @@
     "chrome-devtools": {
       "type": "local",
       "command": [
-        "asdf",
-        "exec",
         "npx",
         "-y",
         "chrome-devtools-mcp@latest",
