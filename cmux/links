@@ -1,2 +1,3 @@
 # source -> destination (relative to ~). See script/link.
+# cmux bug replaces this link with a copy when you approve a resume command; re-link once fixed: https://github.com/manaflow-ai/cmux/issues/15656
 cmux.json -> .config/cmux/cmux.json
