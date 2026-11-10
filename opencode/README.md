@@ -18,6 +18,7 @@ in the **personal** config.
 ├── opencode.jsonc     -> ~/.dotfiles/opencode/opencode.jsonc   (personal, symlink)
 ├── work.jsonc                                                  (work, untracked)
 ├── opencode-notifier.cmux.json -> ~/.dotfiles/opencode/...     (symlink)
+├── tui.json           -> ~/.dotfiles/opencode/tui.json         (TUI theme, symlink)
 └── plugins/                                                    (managed by cmux)
 
 ~/.localrc                                                      (untracked)
@@ -31,6 +32,10 @@ in the **personal** config.
 - OpenCode loads `$OPENCODE_CONFIG` **after** the global
   `~/.config/opencode/opencode.jsonc`, so the work config wins when both set
   the same key. Non-conflicting keys (e.g. separate `mcp` entries) merge.
+- `tui.json` holds terminal UI settings. It uses the `system` theme, which
+  takes colors from the terminal and leaves the background transparent, so
+  Ghostty's `background-opacity` and blur show through. Font, opacity, and
+  blur all come from `ghostty/config`.
 
 Load order (lowest to highest precedence), as shown by
 `opencode debug config --print-logs --log-level DEBUG`:

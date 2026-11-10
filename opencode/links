@@ -2,3 +2,6 @@
 opencode.jsonc -> .config/opencode/opencode.jsonc
 # silent notifier config, used inside cmux via cmux/env.zsh
 opencode-notifier.cmux.json -> .config/opencode/opencode-notifier.cmux.json
+# TUI settings. "system" theme leaves the background transparent so Ghostty's
+# background-opacity/blur show through (font comes from Ghostty too).
+tui.json -> .config/opencode/tui.json
