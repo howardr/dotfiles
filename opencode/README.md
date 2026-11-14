@@ -19,6 +19,7 @@ in the **personal** config.
 ├── work.jsonc                                                  (work, untracked)
 ├── opencode-notifier.cmux.json -> ~/.dotfiles/opencode/...     (symlink)
 ├── tui.json           -> ~/.dotfiles/opencode/tui.json         (TUI theme, symlink)
+├── cli.json           -> ~/.dotfiles/opencode/cli.json         (2.0 terminal settings, symlink)
 └── plugins/                                                    (managed by cmux)
 
 ~/.localrc                                                      (untracked)
@@ -36,6 +37,10 @@ in the **personal** config.
   takes colors from the terminal and leaves the background transparent, so
   Ghostty's `background-opacity` and blur show through. Font, opacity, and
   blur all come from `ghostty/config`.
+- `cli.json` holds OpenCode 2.0 terminal settings (theme, tabs, sessions,
+  diffs, keybinds). Session tabs are off (`tabs.mode: "off"`) because cmux
+  already gives each session its own tab. Reference:
+  <https://opencode.ai/docs/cli/config>
 
 Load order (lowest to highest precedence), as shown by
 `opencode debug config --print-logs --log-level DEBUG`:

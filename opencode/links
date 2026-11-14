@@ -6,3 +6,6 @@ reflect-mcp-bridge.mjs -> .config/opencode/reflect-mcp-bridge.mjs
 # TUI settings. "system" theme leaves the background transparent so Ghostty's
 # background-opacity/blur show through (font comes from Ghostty too).
 tui.json -> .config/opencode/tui.json
+# OpenCode 2.0 terminal settings (theme, tabs, sessions, keybinds).
+# Session tabs are off because cmux already gives each session its own tab.
+cli.json -> .config/opencode/cli.json
