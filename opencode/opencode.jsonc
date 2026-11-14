@@ -6,7 +6,10 @@
     "edit": "allow",
     "webfetch": "allow"
   },
-  "plugin": ["@mohak34/opencode-notifier@1.1.2", "./plugins/cmux"],
+  "plugin": [
+    "@mohak34/opencode-notifier@1.1.2",
+    "./plugins/cmux"
+  ],
   "mcp": {
     "chrome-devtools": {
       "type": "local",
@@ -14,12 +17,24 @@
         "npx",
         "-y",
         "chrome-devtools-mcp@latest",
+        // Throwaway temp profile per session (no profile lock contention).
+        // Projects needing persistent logins override this entry with --userDataDir
+        // (e.g. ~/ai/ff-mount-olympus/opencode.json -> ~/.local/share/chrome-profiles/espn).
+        "--isolated",
         "--no-usage-statistics",
         "--no-performance-crux",
         "--redact-network-headers"
       ],
       "enabled": true,
       "timeout": 30000
+    },
+    "reflect-notes": {
+      "type": "local",
+      "command": [
+        "node",
+        "/Users/howard/.config/opencode/reflect-mcp-bridge.mjs"
+      ],
+      "enabled": true
     }
   }
 }
