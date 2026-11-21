@@ -14,6 +14,9 @@ typeset -g PROMPT_DIRTY_BG='#fab387'  # peach (uncommitted changes)
 typeset -g PROMPT_VCS_FG='#1e1e2e'    # base
 typeset -g PROMPT_ERR_FG='#f38ba8'    # red, last command failed
 typeset -g PROMPT_SEP=$'\ue0b0'
+typeset -g PROMPT_DIRTY_MARK='●'      # uncommitted changes
+typeset -g PROMPT_AHEAD_MARK='↑'      # commits not yet pushed
+typeset -g PROMPT_BEHIND_MARK='↓'     # commits not yet pulled
 
 # ~/.dotfiles/zsh/functions -> ~/.d/z/functions (fish-style)
 _prompt_short_pwd() {
@@ -32,19 +35,38 @@ _prompt_short_pwd() {
   print -r -- "$out"
 }
 
-# Sets _prompt_vcs (label) and _prompt_vcs_dirty (0/1).
+# Sets _prompt_vcs (label), _prompt_vcs_dirty (0/1), and _prompt_ahead /
+# _prompt_behind (commits vs. upstream), from a single git status call.
 _prompt_vcs_info() {
-  _prompt_vcs='' _prompt_vcs_dirty=0
-  local root
-  root=$(command git rev-parse --show-toplevel 2>/dev/null) || return
-  if [[ -d $root/.jj ]]; then
-    _prompt_vcs=jj
-    return
-  fi
-  _prompt_vcs=$(command git symbolic-ref --short -q HEAD 2>/dev/null) ||
-    _prompt_vcs=$(command git rev-parse --short HEAD 2>/dev/null)
-  [[ -n $(command git status --porcelain --ignore-submodules 2>/dev/null | head -n 1) ]] &&
-    _prompt_vcs_dirty=1
+  _prompt_vcs='' _prompt_vcs_dirty=0 _prompt_ahead=0 _prompt_behind=0
+
+  local d=$PWD
+  while [[ -n $d ]]; do
+    if [[ -d $d/.jj ]]; then
+      _prompt_vcs=jj
+      return
+    fi
+    d=${d%/*}
+  done
+
+  local line oid ab
+  local -a st
+  st=("${(@f)$(command git status --porcelain=v2 --branch --ignore-submodules 2>/dev/null)}")
+  [[ -n ${st[1]} ]] || return
+
+  for line in $st; do
+    case $line in
+      ('# branch.oid '*)  oid=${line#'# branch.oid '} ;;
+      ('# branch.head '*) _prompt_vcs=${line#'# branch.head '} ;;
+      ('# branch.ab '*)
+        ab=${line#'# branch.ab '}
+        _prompt_ahead=${${ab%% *}#+}
+        _prompt_behind=${${ab##* }#-} ;;
+      ('#'*) ;;
+      (*) _prompt_vcs_dirty=1 ;;
+    esac
+  done
+  [[ $_prompt_vcs == '(detached)' ]] && _prompt_vcs=${oid[1,7]}
 }
 
 _prompt_build() {
@@ -58,7 +80,11 @@ _prompt_build() {
     local bg=$PROMPT_VCS_BG
     (( _prompt_vcs_dirty )) && bg=$PROMPT_DIRTY_BG
     p+="%K{$bg}%F{$PROMPT_DIR_BG}$PROMPT_SEP"
-    p+="%F{$PROMPT_VCS_FG} ${_prompt_vcs//\%/%%} "
+    local label=${_prompt_vcs//\%/%%}
+    (( _prompt_vcs_dirty )) && label+=" $PROMPT_DIRTY_MARK"
+    (( _prompt_ahead ))     && label+=" $PROMPT_AHEAD_MARK$_prompt_ahead"
+    (( _prompt_behind ))    && label+=" $PROMPT_BEHIND_MARK$_prompt_behind"
+    p+="%F{$PROMPT_VCS_FG} $label "
     p+="%k%F{$bg}$PROMPT_SEP"
   else
     p+="%k%F{$PROMPT_DIR_BG}$PROMPT_SEP"
