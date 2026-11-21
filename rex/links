@@ -1,0 +1,2 @@
+# source -> destination (relative to ~). See script/link.
+init.lua -> .config/rex/init.lua
