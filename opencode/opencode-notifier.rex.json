@@ -1,0 +1,12 @@
+{
+  "notificationSystem": "ghostty",
+  "suppressWhenFocused": false,
+  "showSessionTitle": true,
+  "sound": false,
+  "notification": false,
+  "events": {
+    "permission": { "sound": false, "notification": true, "bell": false },
+    "question": { "sound": false, "notification": true, "bell": false },
+    "error": { "sound": false, "notification": true, "bell": false }
+  }
+}
